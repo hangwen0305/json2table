@@ -1,0 +1,62 @@
+[
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "age": 26,
+    "address": {
+      "streetAddress": "Naist Street",
+      "city": "Nara",
+      "postalCode": "630-0192"
+    },
+    "phones": [
+      {
+        "type": "iPhone",
+        "number": "0123-4567-8888"
+      },
+      {
+        "type": "home",
+        "number": "0123-4567-8910"
+      }
+    ]
+  },
+  {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "age": 30,
+    "address": {
+      "streetAddress": "Cherry Lane",
+      "city": "Kyoto",
+      "postalCode": "600-8000"
+    },
+    "phones": [
+      {
+        "type": "Android",
+        "number": "0987-6543-2211"
+      },
+      {
+        "type": "work",
+        "number": "0987-6543-2212"
+      }
+    ]
+  },
+  {
+    "firstName": "Alice",
+    "lastName": "Brown",
+    "age": 28,
+    "address": {
+      "streetAddress": "Sunset Boulevard",
+      "city": "Osaka",
+      "postalCode": "530-0011"
+    },
+    "phones": [
+      {
+        "type": "iPhone",
+        "number": "0765-4321-5566"
+      },
+      {
+        "type": "home",
+        "number": "0765-4321-5567"
+      }
+    ]
+  }
+]
