@@ -2,12 +2,12 @@ package pumpkin.framework.json2table;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -181,8 +181,21 @@ public class JsonToTableConverter {
             Path path = route.relativePath(header.getPath());
 
             //cache the value for the same row
-            HashMap<Map<String, Object>, Object> cache = new HashMap<>();
-            List<Object> cells = table.stream().map(row -> cache.computeIfAbsent(row, r -> getValueByPath(r, path))).toList();
+            AtomicReference<Map<String, Object>> previous = new AtomicReference<>();
+            AtomicReference<Object> previousValue = new AtomicReference<>();
+
+            List<Object> cells = table.stream().map(row -> {
+                if (row == previous.get()) {
+                    return previousValue.get();
+                }
+
+                final Object value = getValueByPath(row, path);
+
+                previous.set(row);
+                previousValue.set(value);
+
+                return value;
+            }).toList();
 
             columns.add(new TableColumn(header, cells));
         }
