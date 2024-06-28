@@ -1,22 +1,21 @@
 # json2table
 
-A Java-based tool that converts JSON-formatted data into table format.
+基于java的工具，可以将一段JSON格式的数据转换为表格格式。
 
-## Basic Usage
+## 基本用法
 
 ```
 Table table = JsonToTableConverter.toTable(jsonStr);
 String markdown = table.toMarkdown();
 ```
 
-You can output the markdown to a markdown file or access the table instance programmatically.
+我们可以将`markdown`输出到md文件，或者通过编程的方式访问table实例。
 
-For information about the table instance, see [here](#table).
+关于table实例，请看[这里](#table)。
 
+## 先看一些例子
 
-## Let's look at some examples
-
-### Single JSON Object
+### 单个JSON对象
 
 ```json
 {
@@ -26,13 +25,13 @@ For information about the table instance, see [here](#table).
 }
 ```
 
-Markdown output table:
+markdown输出表格：
 
 | firstName | lastName | age |
 |-----------|----------|-----|
 | John      | doe      | 26  |
 
-### JSON Array
+### JSON数组
 
 ```json
 [
@@ -49,14 +48,14 @@ Markdown output table:
 ]
 ```
 
-Markdown output table:
+markdown输出表格：
 
 | firstName | lastName | age |
 |-----------|----------|-----|
 | John      | doe      | 26  |
 | Jane      | doe      | 24  |
 
-#### If the array schema is inconsistent
+#### 如果数组中schema不一致
 
 ```json
 [
@@ -73,18 +72,18 @@ Markdown output table:
 ]
 ```
 
-Markdown output table:
+markdown输出表格：
 
 | firstName | lastName | age | birthday   |
 |-----------|----------|-----|------------|
 | John      | doe      | 26  |            |
 | Jane      | doe      |     | 2000-04-02 |
 
-The table will aggregate all fields, and if a field does not exist in an object, it will be represented as null.
+表格会聚合所有的字段，如果某个字段在某个对象中不存在，那么用null表示。
 
-Subsequent examples will be displayed as arrays, but single objects are also supported.
+后续示例我们都会以数组展示，但是单个对象也是支持的。
 
-### JSON Object with Nested Objects
+### json对象中如果有二级对象
 
 ```json
 [
@@ -122,7 +121,7 @@ Subsequent examples will be displayed as arrays, but single objects are also sup
 
 ```
 
-Markdown output table:
+markdown输出表格：
 
 | firstName | lastName | age | address.streetAddress | address.city | address.postalCode | birthday   |
 |-----------|----------|-----|-----------------------|--------------|--------------------|------------|
@@ -130,9 +129,9 @@ Markdown output table:
 | Jane      | Smith    |     | Cherry Lane           | Kyoto        | 600-8000           | 1994-04-02 |
 | Alice     | Brown    | 28  | Sunset Boulevard      | Osaka        | 530-0011           |            |
 
-Properties in the address field will be expanded to the top level. If there are multiple levels of nested objects, they will also be expanded.
+address中属性会被展开到上一级，如果有多级对象，也会被展开。
 
-### JSON Object with Arrays
+### json对象中如果有数组
 
 ```json
 [
@@ -200,7 +199,7 @@ Properties in the address field will be expanded to the top level. If there are 
 
 ```
 
-Markdown output table:
+markdown输出表格：
 
 | firstName | lastName | age | address.streetAddress | address.city | address.postalCode | phones                                                                                   |
 |-----------|----------|-----|-----------------------|--------------|--------------------|------------------------------------------------------------------------------------------|
@@ -208,16 +207,16 @@ Markdown output table:
 | Jane      | Smith    | 30  | Cherry Lane           | Kyoto        | 600-8000           | [{"type":"Android","number":"0987-6543-2211"},{"type":"work","number":"0987-6543-2212"}] |
 | Alice     | Brown    | 28  | Sunset Boulevard      | Osaka        | 530-0011           | [{"type":"iPhone","number":"0765-4321-5566"},{"type":"home","number":"0765-4321-5567"}]  |
 
-At this point, the phones field is a JSON array string.
+此时，phones字段就是json数组的字符串。
 
-If we want to expand the phones field, we need to do this:
+如果我们想要展开phones字段，需要这样:
 
 ```
 Table table = JsonToTableConverter.toTable(jsonStr, "$.phones");
 String markdown = table.toMarkdown();
 ```
 
-Markdown output table:
+markdown输出表格：
 
 | firstName | lastName | age | address.streetAddress | address.city | address.postalCode | phones.type | phones.number  |
 |-----------|----------|-----|-----------------------|--------------|--------------------|-------------|----------------|
@@ -228,12 +227,12 @@ Markdown output table:
 | Alice     | Brown    | 28  | Sunset Boulevard      | Osaka        | 530-0011           | iPhone      | 0765-4321-5566 |
 | Alice     | Brown    | 28  | Sunset Boulevard      | Osaka        | 530-0011           | home        | 0765-4321-5567 |
 
-"$.phones" is similar to a JSONPath selector, but phones must be an array type; otherwise, the code will throw an IllegalStateException.
-At this point, the table will expand to all objects 'phones' sub-objects, similar to a left join result of top-level objects 
-and phone objects.
+"$.phones"类似jsonpath的选择器，但是phones必须是数组类型，否则的话，代码会抛出一个IllegalStateException。
+此时，表格会展开到所有对象的phones的二级对象，类似一级对象和phone对象的left join的结果。
 
-#### If there are multiple sibling array fields
-We cannot expand multiple sibling arrays in a single table. We can only specify one array through the selector parameter.
+#### 如果有多个同级的数组字段
+
+我们无法在一个表格中同时展开多个同级数组，只能通过选择器参数指定其中一个数组。
 
 ```json
 [
@@ -322,11 +321,11 @@ We cannot expand multiple sibling arrays in a single table. We can only specify 
 | Alice | Brown | 28 | Sunset Boulevard | Osaka | 530-0011 | ["alice.brown@example.com","a.brown@example.com"] | iPhone | 0765-4321-5566 |
 | Alice | Brown | 28 | Sunset Boulevard | Osaka | 530-0011 | ["alice.brown@example.com","a.brown@example.com"] | home | 0765-4321-5567 |
 
-Since "emails" field is specified as "collapsed," only the "phones" field will be "expanded."
+既然选择了"$.phones"，那么emails字段就会被"收起"，只有phones字段会被"展开"。
 
-### Recursive Support
+### 支持递归
 
-If your JSON has deep levels, it is supported.
+如果你的json层次很深，也是支持的。
 
 ```json
 [
@@ -457,9 +456,9 @@ If your JSON has deep levels, it is supported.
 Table table = JsonToTableConverter.toTable(jsonStr, "$.phones.details");
 String markdown = table.toMarkdown();
 ```
-Set the expansion path to "$.phones.details"
+设置展开路径为"$.phones.details"
 
-Markdown output table:
+markdown输出表格：
 
 | firstName | lastName | age | address.streetAddress | address.city | address.postalCode | phones.type | phones.number | phones.details.description | phones.details.verified |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -480,9 +479,9 @@ Markdown output table:
 
 ## <span id='table'>Table</span>
 
-Introducing how to access the table instance programmatically. 
+介绍如何以编程的方式访问table实例。
 
-### Get Table Headers
+### 获取列头标题
 
 ```
 final List<TableHeader> headers = table.getHeaders();
@@ -492,7 +491,7 @@ for (TableHeader header : headers) {
 }
 ```
 
-### Get Row Data
+### 获取行数据
 
 ```
 final List<TableRow> rows = table.getRows();
@@ -510,5 +509,5 @@ for (TableRow.Cell cell : row) {
 }
 ```
 
-How else would you like to use the Table instance, as List<List<Object>>, or as a CSV format string? You can submit an issue.
+大家还希望以怎样的方式使用Table实例，以List<List<Object>>，还是CSV格式字符串？可以提issue。
 
